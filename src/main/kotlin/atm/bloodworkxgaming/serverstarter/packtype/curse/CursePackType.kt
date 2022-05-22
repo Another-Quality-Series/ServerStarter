@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import kotlin.io.path.Path
 
 open class CursePackType(private val configFile: ConfigFile, internetManager: InternetManager) : AbstractZipbasedPackType(configFile, internetManager) {
     private var forgeVersion: String = configFile.install.loaderVersion
@@ -153,8 +154,9 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
             for (jsonElement in json.getAsJsonArray("files")) {
                 val obj = jsonElement.asJsonObject
                 mods.add(ModEntryRaw(
-                        obj.getAsJsonPrimitive("projectID").asString,
-                        obj.getAsJsonPrimitive("fileID").asString))
+                        obj.getAsJsonPrimitive("projectID").asInt,
+                        obj.getAsJsonPrimitive("fileID").asInt,
+                        if (obj.has("downloadUrl")) obj.getAsJsonPrimitive("downloadUrl").asString else ""))
             }
         }
 
@@ -167,6 +169,7 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
     )
 
     data class GetFilesResponseMod(
+        val id: Int,
         val modId: Int,
         val fileName: String,
         val displayName: String,
@@ -180,9 +183,42 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
     )
 
     private fun requestModInformation(mods: List<ModEntryRaw>, ignoreSet: HashSet<String>): GetFilesResponse {
+        fun ignoreMods(
+                mods: List<GetFilesResponseMod>,
+        ): List<GetFilesResponseMod> {
+            val ignoredMods = mods.filter { ignoreSet.contains(it.modId.toString()) }
+            val ignoredModsString =
+                    ignoredMods.joinToString(separator = "\n") { "\t${it.fileName} (${it.modId})" }
+
+            LOGGER.info("Ignoring the following mods:\n $ignoredModsString")
+            return mods.filter { !ignoreSet.contains(it.modId.toString()) }
+        }
+
+        if (configFile.install.curseForgeApiKey.isNullOrEmpty()) {
+            if (mods.all { !it.downloadUrl.isEmpty() }) {
+                LOGGER.info("No API Key provided, but downloadUrls found in manifest.json")
+                return GetFilesResponse(mods
+                                .map { mod ->
+                                    val filename = Path(mod.downloadUrl).fileName.toString()
+                                    GetFilesResponseMod(
+                                            mod.fileID,
+                                            mod.projectID,
+                                            filename,
+                                            filename,
+                                            mod.downloadUrl,
+                                            emptyList()
+                                    )
+                                }
+                                .let(::ignoreMods)
+                )
+            } else {
+                throw RuntimeException("No API Key provided")
+            }
+        }
+
         LOGGER.info("Requesting Download links from curse api.")
 
-        data class GetModFilesRequestBody(val fileIds: List<String>)
+        data class GetModFilesRequestBody(val fileIds: List<Int>)
         val fileList = GetModFilesRequestBody(mods.map { it.fileID }.toList())
         println(fileList)
 
@@ -212,13 +248,18 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
 
         val jsonRes = mapper.readValue<GetFilesResponse>(str)
         LOGGER.info("Converted Response from manifest query: $jsonRes", true)
-
-
-        val ignoredMods = jsonRes.data.filter { ignoreSet.contains(it.modId.toString()) }
-        val ignoredModsString = ignoredMods.joinToString(separator = "\n") { "\t${it.displayName} (${it.modId})" }
-        LOGGER.info("Ignoring the following mods:\n $ignoredModsString")
-
-        return GetFilesResponse(jsonRes.data.filter { !ignoreSet.contains(it.modId.toString()) })
+        
+        return GetFilesResponse(jsonRes.data
+                        .let(::ignoreMods)
+                        .map { mi ->
+                            if (!mi.downloadUrl.isNullOrEmpty()) {
+                                mi
+                            } else {
+                                LOGGER.info("No downloadUrl for ${mi.fileName}")
+                                mi.copy(downloadUrl = mods.find { it.fileID == mi.id }!!.downloadUrl)
+                            }
+                        }
+        )
     }
 
     /**
@@ -281,8 +322,8 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
             }
         }
 
-        mods.filter { it.downloadUrl == null }.forEach {
-            println("Downloading ${it.displayName} is prohibited, please download it on your own.")
+        mods.filter { it.downloadUrl.isNullOrEmpty() }.forEach {
+            println("Downloading ${it.fileName} is prohibited, please download it on your own.")
         }
     }
 
@@ -323,4 +364,4 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
 /**
  * Data class to keep projectID and fileID together
  */
-data class ModEntryRaw(val projectID: String, val fileID: String)
+data class ModEntryRaw(val projectID: Int, val fileID: Int, val downloadUrl: String)
