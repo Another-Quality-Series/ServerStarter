@@ -20,3 +20,5 @@ gradle-app.setting
 /secrets.properties
 /serverstarter.lock
 /setup_2/
+/server/
+/bin/
