@@ -7,6 +7,7 @@ import atm.bloodworkxgaming.serverstarter.config.ConfigFile
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.fusesource.jansi.Ansi.ansi
+import org.fusesource.jansi.Ansi
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -113,12 +114,13 @@ class LoaderManager(private val configFile: ConfigFile, private val internetMana
             if (lines.size > 2 && !lines[2].contains("true")) {
                 LOGGER.info(ansi().fgCyan().a("You have not accepted the eula yet."))
                 LOGGER.info(
-                    ansi().fgCyan().a("By typing TRUE you are indicating your agreement to the EULA of Mojang.")
+                    ansi().fgCyan().a("By typing ").fgMagenta().a("TRUE").fgCyan().a(" you are indicating your agreement to the EULA of Mojang.")
                 )
                 LOGGER.info(
                     ansi().fgCyan()
                         .a("Read it at https://account.mojang.com/documents/minecraft_eula before accepting it.")
                 )
+                print(ansi().a(Ansi.Attribute.BLINK_SLOW).a("> ").reset())
 
                 val answer = readLine()
                 if (answer?.trim().equals("true", ignoreCase = true)) {
@@ -289,6 +291,8 @@ class LoaderManager(private val configFile: ConfigFile, private val internetMana
                         LOGGER.warn("Windows does not support RAMDisk yet!")
                     }
                 }
+
+            checkEULA(configFile.install.baseInstallPath)
 
             LOGGER.info("Using arguments: $arguments", true)
             LOGGER.info("Starting Loader, output incoming")
