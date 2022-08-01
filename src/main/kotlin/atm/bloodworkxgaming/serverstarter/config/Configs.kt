@@ -62,6 +62,7 @@ data class InstallConfig(
     var mcVersion: String = "",
 
     var loaderVersion: String = "",
+    var installerVersion: String = "",
     var installerUrl: String = "",
     var installerArguments: List<String> = Collections.emptyList(),
 

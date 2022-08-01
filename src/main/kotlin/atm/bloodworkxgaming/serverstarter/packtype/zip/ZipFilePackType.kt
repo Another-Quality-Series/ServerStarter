@@ -24,6 +24,7 @@ class ZipFilePackType(configFile: ConfigFile, internetManager: InternetManager) 
 
     private var forgeVersion: String = configFile.install.loaderVersion
     private var mcVersion: String = configFile.install.mcVersion
+    private var installerVersion: String = configFile.install.installerVersion
     private val oldFiles = File(basePath + "OLD_TO_DELETE/")
 
     override fun getForgeVersion(): String {
@@ -32,6 +33,10 @@ class ZipFilePackType(configFile: ConfigFile, internetManager: InternetManager) 
 
     override fun getMCVersion(): String {
         return mcVersion
+    }
+
+    override fun getInstallerVersion(): String {
+        return installerVersion
     }
 
     @Throws(IOException::class)

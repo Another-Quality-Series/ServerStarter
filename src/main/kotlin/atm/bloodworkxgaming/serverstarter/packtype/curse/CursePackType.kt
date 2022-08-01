@@ -32,6 +32,7 @@ import kotlin.io.path.Path
 open class CursePackType(private val configFile: ConfigFile, internetManager: InternetManager) : AbstractZipbasedPackType(configFile, internetManager) {
     private var forgeVersion: String = configFile.install.loaderVersion
     private var mcVersion: String = configFile.install.mcVersion
+    private var installerVersion: String = configFile.install.installerVersion
     private val oldFiles = File(basePath + "OLD_TO_DELETE/")
 
     override fun cleanUrl(url: String): String {
@@ -57,6 +58,15 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
      */
     override fun getMCVersion(): String {
         return mcVersion
+    }
+
+    /**
+     * Gets the installer version, can be based on the version from the downloaded pack
+     *
+     * @return String representation of the version
+     */
+    override fun getInstallerVersion(): String {
+        return installerVersion
     }
 
     @Throws(IOException::class)

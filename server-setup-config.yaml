@@ -23,13 +23,17 @@ install:
 
   # exact version of forge or fabric that is supposed to be used
   # if this value is a null value so ( ~, null, or "" ) then the version from the mod pack is going to be used
-  loaderVersion: 37.0.95
+
+  # installer version
+  # useful for fabric as its not using the loaderVersion
+  # check https://fabricmc.net/use/installer/ for the latest installer version
+  installerVersion: 0.11.0
 
   # If a custom installer is supposed to used, specify the url here: (Otherwise put "", ~ or null here)
-  # supports variables: {{@loaderversion@}} and {{@mcversion@}}
+  # supports variables: {{@loaderversion@}}, {{@mcversion@}} and {{@installerversion@}}
   # For forge: "https://files.minecraftforge.net/maven/net/minecraftforge/forge/{{@mcversion@}}-{{@loaderversion@}}/forge-{{@mcversion@}}-{{@loaderversion@}}-installer.jar"
-  # For Fabric: "https://maven.fabricmc.net/net/fabricmc/fabric-installer/{{@loaderversion@}}/fabric-installer-{{@loaderversion@}}.jar"
-  installerUrl: "https://files.minecraftforge.net/maven/net/minecraftforge/forge/{{@mcversion@}}-{{@loaderversion@}}/forge-{{@mcversion@}}-{{@loaderversion@}}-installer.jar"
+  # For Fabric: "https://maven.fabricmc.net/net/fabricmc/fabric-installer/{{@installerversion@}}/fabric-installer-{{@installerversion@}}.jar"
+  installerUrl: "https://maven.fabricmc.net/net/fabricmc/fabric-installer/{{@installerversion@}}/fabric-installer-{{@installerversion@}}.jar"
 
   # Installer Arguments
   # These Arguments have to be passed to the installer
@@ -38,12 +42,21 @@ install:
   # installerArguments:
   #   - "-downloadMinecraft"
   #   - "server"
+  #   - "-mcversion"
+  #   - "{{@mcversion@}}"
+  #   - "-loader"
+  #   - "{{@loaderversion@}}"
   #
   # For Forge:
   # installerArguments:
   #   - "--installServer"
   installerArguments:
-    - "--installServer"
+    - "server"
+    - "-downloadMinecraft"
+    - "-mcversion"
+    - "{{@mcversion@}}"
+    - "-loader"
+    - "{{@loaderversion@}}"
 
   # Link to where the file where the modpack can be distributed
   # This supports loading from local files as well for most pack types if there is file://{PathToFile} in the beginning

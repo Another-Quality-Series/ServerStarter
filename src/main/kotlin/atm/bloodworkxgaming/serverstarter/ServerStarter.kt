@@ -171,7 +171,8 @@ class ServerStarter(args: Array<String>) {
             if (config.install.installLoader) {
                 val forgeVersion = packtype.getForgeVersion()
                 val mcVersion = packtype.getMCVersion()
-                forgeManager.installLoader(config.install.baseInstallPath, forgeVersion, mcVersion)
+                val installerVersion = packtype.getInstallerVersion()
+                forgeManager.installLoader(config.install.baseInstallPath, forgeVersion, installerVersion, mcVersion)
             }
 
             if (config.launch.spongefix) {

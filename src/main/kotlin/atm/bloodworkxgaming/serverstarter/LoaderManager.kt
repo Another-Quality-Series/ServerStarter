@@ -134,12 +134,17 @@ class LoaderManager(private val configFile: ConfigFile, private val internetMana
 
     }
 
-    fun installLoader(basePath: String, loaderVersion: String, mcVersion: String): Boolean {
+    fun installLoader(basePath: String, loaderVersion: String, installerVersion: String, mcVersion: String): Boolean {
         // val versionString = "$mcVersion-$forgeVersion"
         // val url = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/$versionString/forge-$versionString-installer.jar"
-        val url = configFile.install.installerUrl
-            .replace("{{@loaderversion@}}", loaderVersion)
-            .replace("{{@mcversion@}}", mcVersion)
+        val replaceVars = { s: String ->
+            s.replace("{{@loaderversion@}}", loaderVersion)
+             .replace("{{@mcversion@}}", mcVersion)
+             .replace("{{@installerversion@}}", installerVersion)
+        }
+
+
+        val url = replaceVars(configFile.install.installerUrl)
         // http://files.minecraftforge.net/maven/net/minecraftforge/forge/1.12.2-14.23.3.2682/forge-1.12.2-14.23.3.2682-installer.jar
         //val installerPath = File(basePath + "forge-" + versionString + "-installer.jar")
         val installerPath = File(basePath + "installer.jar")
@@ -157,7 +162,7 @@ class LoaderManager(private val configFile: ConfigFile, private val internetMana
                 java,
                 "-jar",
                 installerPath.absolutePath,
-                *configFile.install.installerArguments.toTypedArray()
+                *configFile.install.installerArguments.map(replaceVars).toTypedArray()
             )
                 .inheritIO()
                 .directory(File("$basePath."))

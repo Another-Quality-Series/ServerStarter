@@ -39,4 +39,11 @@ interface IPackType {
      * @return String representation of the version
      */
     fun getMCVersion(): String
+
+    /**
+     * Gets the installer version, can be based on the version from the downloaded pack
+     *
+     * @return String representation of the version
+     */
+    fun getInstallerVersion(): String
 }
