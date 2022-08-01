@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'eclipse'
     id "org.jetbrains.kotlin.jvm" version "1.5.31"
     id "com.github.johnrengelman.shadow" version "7.0.0"
     id "com.github.breadmoirai.github-release" version "2.2.12"
@@ -39,6 +41,11 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.fusesource.jansi/jansi
     implementation  group: 'org.fusesource.jansi', name: 'jansi', version: '2.3.4'
+}
+
+
+application {
+    mainClass = 'atm.bloodworkxgaming.serverstarter.ServerStarterKt'
 }
 
 shadowJar {
