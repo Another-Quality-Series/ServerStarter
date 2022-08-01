@@ -106,10 +106,11 @@ task zipDist (type: Zip) {
 
 githubRelease {
     token = getGithubKey()
-    owner = "BloodWorkXGaming"
+    owner = "Another-Quality-Series"
     repo = "ServerStarter"
 
-    releaseAssets file("$buildDir/release/serverstarter-${version}.zip")
+    releaseAssets file("$buildDir/release/serverstarter-${version}.zip"),
+                  file("$buildDir/dist/serverstarter-$version/serverstarter-${version}.jar")
 }
 
 tasks.githubRelease.dependsOn zipDist
