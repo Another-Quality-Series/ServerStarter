@@ -344,12 +344,12 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
             val fileName = mod.fileName // FilenameUtils.getName(mod.downloadUrl)
             for (ignorePattern in ignorePatterns) {
                 if (ignorePattern.matcher(fileName).matches()) {
-                    LOGGER.info("[" + counter.incrementAndGet() + "/" + totalCount + "] Skipped ignored mod: " + mod.displayName)
+                    LOGGER.info("[" + counter.incrementAndGet() + "/" + totalCount + "] Skipped ignored mod: " + mod.fileName)
                 }
             }
 
             internetManager.downloadToFile(mod.downloadUrl, File(basePath + "mods/" + fileName))
-            LOGGER.info("[" + String.format("% 3d", counter.incrementAndGet()) + "/" + totalCount + "] Downloaded mod: " + mod.displayName)
+            LOGGER.info("[" + String.format("% 3d", counter.incrementAndGet()) + "/" + totalCount + "] Downloaded mod: " + mod.fileName)
 
         } catch (e: IOException) {
             LOGGER.error("Failed to download mod", e)
