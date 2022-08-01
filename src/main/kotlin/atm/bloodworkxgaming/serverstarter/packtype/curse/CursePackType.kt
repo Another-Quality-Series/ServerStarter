@@ -133,7 +133,7 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
         val mods = ArrayList<ModEntryRaw>()
 
         InputStreamReader(FileInputStream(File(basePath + "manifest.json")), "utf-8").use { reader ->
-            val json = JsonParser().parse(reader).asJsonObject
+            val json = JsonParser.parseReader(reader).asJsonObject
             LOGGER.info("manifest JSON Object: $json", true)
             val mcObj = json.getAsJsonObject("minecraft")
 
