@@ -16,19 +16,13 @@ class PrimitiveLogger(outputFile: File) {
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
     private val bufferedSink = outputFile.sink().buffer()
 
-    init {
-        if (outputFile.exists()) {
-            outputFile.delete()
-        }
-    }
-
     @JvmOverloads
     fun info(message: Any?, logOnly: Boolean = false) {
         val m = currentTimeAnsi().fgYellow().a("[INFO] ").fgDefault().a(message).reset().newline().toString()
 
         synchronized(this) {
             try {
-                bufferedSink.writeUtf8(stripColors(m))
+                bufferedSink.writeUtf8(stripColors(m)).flush()
             } catch (e: IOException) {
                 error("Error while logging!", e)
             }
@@ -44,7 +38,7 @@ class PrimitiveLogger(outputFile: File) {
 
         synchronized(this) {
             try {
-                bufferedSink.writeUtf8(stripColors(m))
+                bufferedSink.writeUtf8(stripColors(m)).flush()
             } catch (e: IOException) {
                 error("Error while logging!", e)
             }
@@ -64,7 +58,7 @@ class PrimitiveLogger(outputFile: File) {
 
         synchronized(this) {
             try {
-                bufferedSink.writeUtf8(stripColors(m))
+                bufferedSink.writeUtf8(stripColors(m)).flush()
             } catch (e: IOException) {
                 System.err.println("Error while logging!")
                 e.printStackTrace()
