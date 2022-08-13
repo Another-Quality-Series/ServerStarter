@@ -209,7 +209,7 @@ open class CursePackType(private val configFile: ConfigFile, internetManager: In
                 LOGGER.info("No API Key provided, but downloadUrls found in manifest.json")
                 return GetFilesResponse(mods
                                 .map { mod ->
-                                    val filename = Path(mod.downloadUrl).fileName.toString()
+                                    val filename = mod.downloadUrl.substringAfterLast("/")
                                     GetFilesResponseMod(
                                             mod.fileID,
                                             mod.projectID,
